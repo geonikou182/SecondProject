@@ -1,0 +1,78 @@
+﻿@model ShoppingApp.Models.ProductClass
+@{
+    ViewBag.Title = "NewProduct";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    if (Model.UserRole.Contains("Employee"))
+    {
+        <h2>Add a new Product</h2>
+        <form>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" aria-describedby="emailHelp" placeholder="Name">
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="text" class="form-control" id="quantity" placeholder="Quantity">
+            </div>
+            <div class="form-group">
+                <label for="price">Price</label>
+                <input type="text" class="form-control" id="price" placeholder="Price">
+            </div>
+            <div class="input-group mb-3">
+                <input type="text" id="imageUrl" class="form-control" placeholder="Image Url" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" id="checkImage" type="button">Check Url</button>
+                </div>
+            </div>
+
+            <button type="button" id="addProduct" class="btn btn-primary">Add</button>
+        </form>
+        <br/>
+        <div >
+            <img src="https://placehold.it/80x80" id="preview" class="img-thumbnail">
+        </div>
+    }
+    else
+    {
+        <h2>You are not authorized to view this page</h2>
+    }
+}
+
+<script>
+    $("#checkImage").click(function() {
+        var url = $("#imageUrl").val();
+        $('#preview').attr('src', url);
+    });
+
+    $("#addProduct").click(function() {
+        var name = $("#name").val();
+        var price = $("#price").val();
+        var quantity = $("#quantity").val();
+        var url = $("#imageUrl").val();
+
+        var items = {
+            ProductName: name,
+            ProductPrice: price,
+            ProductQuantity: quantity,
+            ProductImage: url
+        };
+        var data = JSON.stringify({ 'model': items });
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("AddProduct", "Admin")',
+            dataType: 'json',
+            data: data,
+            contentType: "application/json; charset=utf-8",
+            success: function(data) {
+                if (data.success == true) {
+                    alert("Το προϊόν προστέθηκε με επιτυχία στη βάση");
+                } else {
+                    alert("Υπήρξε πρόβλημα στην εισαγωγή");
+                }
+            }
+        });
+    });
+</script>
